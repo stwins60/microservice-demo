@@ -81,18 +81,18 @@ pipeline {
                     dir('./k8s') {
                         kubeconfig(credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', serverUrl: '') {
                             if (env.BRANCH_NAME == 'dev') {
-                                sh "sed -i 's/CART_MICROSERVICE_TAG/${env.IMAGE_TAG}/' cart-microservice-patch.yaml"
-                                sh "sed -i 's/PRODUCT_MICROSERVICE_TAG/${env.IMAGE_TAG}/' product-microservice-patch.yaml"
+                                sh "sed -i 's/CART_MICROSERVICE_TAG/${env.IMAGE_TAG}/' overlays/dev/cart-microservice-patch.yaml"
+                                sh "sed -i 's/PRODUCT_MICROSERVICE_TAG/${env.IMAGE_TAG}/' overlays/dev/product-microservice-patch.yaml"
                                 sh "kustomize build overlays/dev | kubectl apply -f -"
                                 slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${IMAGE_TAG} deployed to dev"
                             } else if (env.BRANCH_NAME == 'staging') {
-                                sh "sed -i 's/CART_MICROSERVICE_TAG/${env.IMAGE_TAG}/' cart-microservice-patch.yaml"
-                                sh "sed -i 's/PRODUCT_MICROSERVICE_TAG/${env.IMAGE_TAG}/' product-microservice-patch.yaml"
+                                sh "sed -i 's/CART_MICROSERVICE_TAG/${env.IMAGE_TAG}/' overlays/dev/cart-microservice-patch.yaml"
+                                sh "sed -i 's/PRODUCT_MICROSERVICE_TAG/${env.IMAGE_TAG}/' overlays/dev/product-microservice-patch.yaml"
                                 sh "kustomize build overlays/staging | kubectl apply -f -"
                                 slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${IMAGE_TAG} deployed to staging"
                             } else if (env.BRANCH_NAME == 'prod') {
-                                sh "sed -i 's/CART_MICROSERVICE_TAG/${env.IMAGE_TAG}/' cart-microservice-patch.yaml"
-                                sh "sed -i 's/PRODUCT_MICROSERVICE_TAG/${env.IMAGE_TAG}/' product-microservice-patch.yaml"
+                                sh "sed -i 's/CART_MICROSERVICE_TAG/${env.IMAGE_TAG}/' overlays/dev/cart-microservice-patch.yaml"
+                                sh "sed -i 's/PRODUCT_MICROSERVICE_TAG/${env.IMAGE_TAG}/' overlays/dev/product-microservice-patch.yaml"
                                 sh "kustomize build overlays/prod | kubectl apply -f -"
                                 slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${IMAGE_TAG} deployed to prod"
                             }
