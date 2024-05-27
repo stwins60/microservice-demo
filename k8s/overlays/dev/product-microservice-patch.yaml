@@ -31,7 +31,7 @@ spec:
                limits:
                  memory: "128Mi"
                  cpu: "500m"
-             image: PRODUCT_IMAGE_NAME
+             image: idrisniyi94/product-microservice:PRODUCT_MICROSERVICE_TAG
              ports:
                - containerPort: 5000
             

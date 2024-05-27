@@ -24,7 +24,7 @@ spec:
                                - proxmox
            containers:
            - name: cart-microservice
-             image: CART_IMAGE_NAME
+             image: idrisniyi94/cart-microservice:CART_MICROSERVICE_TAG
              resources:
                requests:
                  memory: "64Mi"
