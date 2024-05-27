@@ -56,9 +56,14 @@ pipeline {
         stage("Docker Build") {
             steps {
                 script {
-                    sh "docker build -t $CART_IMAGE_NAME -f cart-microservice/Dockerfile ."
-                    sh "docker build -t $PRODUCT_IMAGE_NAME -f product-microservice/Dockerfile ."
-                    echo "Image built successfully"
+                    dir('./cart-microservice') {
+                        sh "docker build -t $CART_IMAGE_NAME -f ."
+                        sh "Image built successfully"
+                    }
+                    dir('./product-microservice') {
+                        sh "docker build -t $PRODUCT_IMAGE_NAME -f product-microservice/Dockerfile ."
+                        echo "Image built successfully"
+                    }
                 }
             }
         }
