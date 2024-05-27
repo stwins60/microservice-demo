@@ -24,6 +24,14 @@ spec:
                                - proxmox
            containers:
            - name: product-microservice
-             image: idrisniyi94/product-microservice:latest
+             resources:
+               requests:
+                 memory: "64Mi"
+                 cpu: "250m"
+               limits:
+                 memory: "128Mi"
+                 cpu: "500m"
+             image: PRODUCT_IMAGE_NAME
              ports:
                - containerPort: 5000
+            
