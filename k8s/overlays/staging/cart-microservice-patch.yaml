@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-microservice
+  namespace: default
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: cart-microservice
+    template:
+        metadata:
+           labels:
+               app: cart-microservice
+        spec:
+           affinity:
+              nodeAffinity:
+                 requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                       - matchExpressions:
+                          - key: custom-label
+                            operator: In
+                            values:
+                               - proxmox
+           containers:
+           - name: cart-microservice
+             image: idrisniyi94/cart-microservice:latest
+             ports:
+               - containerPort: 5000

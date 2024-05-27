@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-microservice
+  namespace: default
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: product-microservice
+    template:
+        metadata:
+           labels:
+               app: product-microservice
+        spec:
+           affinity:
+              nodeAffinity:
+                 requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                       - matchExpressions:
+                          - key: custom-label
+                            operator: In
+                            values:
+                               - proxmox
+           containers:
+           - name: product-microservice
+             image: idrisniyi94/product-microservice:latest
+             ports:
+               - containerPort: 5000

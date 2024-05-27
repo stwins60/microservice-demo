@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-microservice-service
+  namespace: dev-namespace
+spec:
+   type: NodePort
+   ports:
+       - port: 5000
+         targetPort: 5000
+         nodePort: 30190
