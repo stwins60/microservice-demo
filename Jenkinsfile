@@ -9,9 +9,9 @@ pipeline {
         CART_DEPLOYMENT_NAME = 'cart-microservice'
         PRODUCT_DEPLOYMENT_NAME = 'product-microservice'
         IMAGE_TAG = "v.0.0.${env.BUILD_NUMBER}"
-        CART_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${CART_DEPLOYMENT_NAME}:${IMAGE_TAG}"
-        PRODUCT_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${PRODUCT_DEPLOYMENT_NAME}:${IMAGE_TAG}"
-        BRANCH_NAME = "${GIT_BRANCH.split('/')[1]}"
+        CART_IMAGE_NAME = "${env.DOCKERHUB_USERNAME}/${env.CART_DEPLOYMENT_NAME}:${env.IMAGE_TAG}"
+        PRODUCT_IMAGE_NAME = "${env.DOCKERHUB_USERNAME}/${env.PRODUCT_DEPLOYMENT_NAME}:${env.IMAGE_TAG}"
+        BRANCH_NAME = "${env.GIT_BRANCH.split('/')[1]}"
     }
 
     stages {
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('sonar-server') {
-                        sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=microservice -Dsonar.projectName=microservice"
+                        sh "${env.SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=microservice -Dsonar.projectName=microservice"
                     }
                 }
             }
@@ -49,7 +49,7 @@ pipeline {
         }
         stage("Login to DockerHub") {
             steps {
-                sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                sh "echo ${env.DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${env.DOCKERHUB_CREDENTIALS_USR} --password-stdin"
                 echo "Login Successful"
             }
         }
@@ -57,11 +57,11 @@ pipeline {
             steps {
                 script {
                     dir('./cart-microservice') {
-                        sh "docker build -t $CART_IMAGE_NAME ."
+                        sh "docker build -t ${env.CART_IMAGE_NAME} ."
                         echo "Image built successfully"
                     }
                     dir('./product-microservice') {
-                        sh "docker build -t $PRODUCT_IMAGE_NAME ."
+                        sh "docker build -t ${env.PRODUCT_IMAGE_NAME} ."
                         echo "Image built successfully"
                     }
                 }
@@ -70,8 +70,8 @@ pipeline {
         stage("Docker Push") {
             steps {
                 script {
-                    sh "docker push $CART_IMAGE_NAME"
-                    sh "docker push $PRODUCT_IMAGE_NAME"
+                    sh "docker push ${env.CART_IMAGE_NAME}"
+                    sh "docker push ${env.PRODUCT_IMAGE_NAME}"
                 }
             }
         }
@@ -81,20 +81,20 @@ pipeline {
                     dir('./k8s') {
                         kubeconfig(credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', serverUrl: '') {
                             if (env.BRANCH_NAME == 'dev') {
-                                sh "sed -i 's|{{CART_IMAGE_NAME}}|${CART_IMAGE_NAME}|g' overlays/dev/cart-microservice-patch.yaml"
-                                sh "sed -i 's|{{PRODUCT_IMAGE_NAME}}|${PRODUCT_IMAGE_NAME}|g' overlays/dev/product-microservice-patch.yaml"
+                                sh "sed -i 's|{{CART_IMAGE_NAME}}|${env.CART_IMAGE_NAME}|g' overlays/dev/cart-microservice-patch.yaml"
+                                sh "sed -i 's|{{PRODUCT_IMAGE_NAME}}|${env.PRODUCT_IMAGE_NAME}|g' overlays/dev/product-microservice-patch.yaml"
                                 sh "kustomize build overlays/dev | kubectl apply -f -"
-                                slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${IMAGE_TAG} deployed to dev"
+                                slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${env.IMAGE_TAG} deployed to dev"
                             } else if (env.BRANCH_NAME == 'staging') {
-                                sh "sed -i 's|{{CART_IMAGE_NAME}}|${CART_IMAGE_NAME}|g' overlays/staging/cart-microservice-patch.yaml"
-                                sh "sed -i 's|{{PRODUCT_IMAGE_NAME}}|${PRODUCT_IMAGE_NAME}|g' overlays/staging/product-microservice-patch.yaml"
+                                sh "sed -i 's|{{CART_IMAGE_NAME}}|${env.CART_IMAGE_NAME}|g' overlays/staging/cart-microservice-patch.yaml"
+                                sh "sed -i 's|{{PRODUCT_IMAGE_NAME}}|${env.PRODUCT_IMAGE_NAME}|g' overlays/staging/product-microservice-patch.yaml"
                                 sh "kustomize build overlays/staging | kubectl apply -f -"
-                                slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${IMAGE_TAG} deployed to staging"
+                                slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${env.IMAGE_TAG} deployed to staging"
                             } else if (env.BRANCH_NAME == 'prod') {
-                                sh "sed -i 's|{{CART_IMAGE_NAME}}|${CART_IMAGE_NAME}|g' overlays/prod/cart-microservice-patch.yaml"
-                                sh "sed -i 's|{{PRODUCT_IMAGE_NAME}}|${PRODUCT_IMAGE_NAME}|g' overlays/prod/product-microservice-patch.yaml"
+                                sh "sed -i 's|{{CART_IMAGE_NAME}}|${env.CART_IMAGE_NAME}|g' overlays/prod/cart-microservice-patch.yaml"
+                                sh "sed -i 's|{{PRODUCT_IMAGE_NAME}}|${env.PRODUCT_IMAGE_NAME}|g' overlays/prod/product-microservice-patch.yaml"
                                 sh "kustomize build overlays/prod | kubectl apply -f -"
-                                slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${IMAGE_TAG} deployed to prod"
+                                slackSend channel: '#alerts', color: 'good', message: "Cart and Product Microservices with tag ${env.IMAGE_TAG} deployed to prod"
                             }
                             else {
                                 echo "No deployment for this branch"
