@@ -57,11 +57,11 @@ pipeline {
             steps {
                 script {
                     dir('./cart-microservice') {
-                        sh "docker build -t $CART_IMAGE_NAME -f ."
+                        sh "docker build -t $CART_IMAGE_NAME ."
                         sh "Image built successfully"
                     }
                     dir('./product-microservice') {
-                        sh "docker build -t $PRODUCT_IMAGE_NAME -f product-microservice/Dockerfile ."
+                        sh "docker build -t $PRODUCT_IMAGE_NAME ."
                         echo "Image built successfully"
                     }
                 }
