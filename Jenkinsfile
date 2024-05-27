@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('sonar-server') {
-                        sh "$SONAR_SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=microservice -Dsonar.projectName=microservice"
+                        sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=microservice -Dsonar.projectName=microservice"
                     }
                 }
             }
