@@ -58,7 +58,7 @@ pipeline {
                 script {
                     dir('./cart-microservice') {
                         sh "docker build -t $CART_IMAGE_NAME ."
-                        sh "Image built successfully"
+                        echo "Image built successfully"
                     }
                     dir('./product-microservice') {
                         sh "docker build -t $PRODUCT_IMAGE_NAME ."
